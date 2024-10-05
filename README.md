@@ -2,7 +2,7 @@
 
 This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl` generated sites.
 
-`TuringNavbar.html` contains code for building navigation bar for Turing language satellite packages' documentation but you can use your own navigation bar for your project!
+`TuringNavbar.html` in scripts directory contains code for building navigation bar for Turing language satellite packages' documentation but you can use your own navigation bar for your project!
 
 ## How to use
 
