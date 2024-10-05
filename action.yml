@@ -1,0 +1,39 @@
+name: 'Add Navbar Action'
+description: 'Adds a top navigation bar to Documenter.jl-generated sites in the gh-pages branch.'
+inputs:
+  navbar-url:
+    description: 'URL of the navbar HTML to be inserted.'
+    required: true
+  exclude-paths:
+    description: 'Comma-separated list of paths to exclude from navbar insertion.'
+    required: false
+    default: ''
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout gh-pages
+      uses: actions/checkout@v4
+      with:
+        ref: gh-pages
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config user.name github-actions[bot]
+        git config user.email github-actions[bot]@users.noreply.github.com
+      shell: bash
+
+    - name: Update Navbar
+      run: |
+        chmod +x scripts/insert_navbar.sh
+        ./scripts/insert_navbar.sh . "${{ inputs.navbar-url }}" --exclude "${{ inputs.exclude-paths }}"
+        if [[ -n $(git status -s) ]]; then
+          git add .
+          git commit -m "Added navbar using insert_navbar.sh"
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+        else
+          echo "No changes to commit"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      shell: bash
