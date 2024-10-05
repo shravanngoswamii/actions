@@ -6,7 +6,7 @@ This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl
 
 ## How to use
 
-```
+```yaml
 - name: Add Navbar
   uses: shravanngoswamii/DocsNav@v1
   with:
