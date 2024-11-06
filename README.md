@@ -10,11 +10,13 @@ This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl
 
 ### Example usage
 
+Use this as one step in the build process for your documentation.
+
 ```yaml
 - name: Add Navbar
   uses: TuringLang/actions/DocsNav
   with:
-    doc-path: 'Path to the Documenter.jl output', default: 'docs/build'
+    doc-path: 'Path to the built HTML documentation.', default: 'docs/build'
     navbar-url: 'URL of the navbar HTML to be inserted.', default: './scripts/TuringNavbar.html'
     exclude-paths: 'Comma-separated list of paths to exclude from navbar insertion.'
 ```
@@ -52,7 +54,7 @@ on:
 
 concurrency:
   # Skip intermediate builds: always.
-r # Cancel intermediate builds: only if it is a pull request build.
+  # Cancel intermediate builds: only if it is a pull request build.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
@@ -66,7 +68,7 @@ jobs:
 
     steps:
       - name: Build and deploy Documenter.jl docs
-        uses: TuringLang/DocsNav/DocsDocumenter@v2
+        uses: TuringLang/actions/DocsDocumenter@v2
 ```
 
 ### Parameters
