@@ -8,7 +8,8 @@ inputs:
     default: 'docs/build'
   navbar-url:
     description: 'URL of the navbar HTML to be inserted.'
-    required: true
+    required: false
+    default: 'https://raw.githubusercontent.com/TuringLang/turinglang.github.io/main/assets/scripts/TuringNavbar.html'
   exclude-paths:
     description: 'Comma-separated list of paths to exclude from navbar insertion.'
     required: false
