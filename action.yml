@@ -31,11 +31,11 @@ runs:
       run: |
         chmod +x ${{ github.action_path }}/scripts/insert_navbar.sh
         ${{ github.action_path }}/scripts/insert_navbar.sh . "${{ inputs.navbar-url }}" --exclude "${{ inputs.exclude-paths }}"
-        if [[ -n $(git status -s) ]]; then
-          git add .
-          git commit -m "Added navbar using insert_navbar.sh"
-          git push "https://${{ github.actor }}:${{ inputs.token }}@github.com/${{ github.repository }}.git" gh-pages
-        else
-          echo "No changes to commit"
-        fi
+        # if [[ -n $(git status -s) ]]; then
+        #   git add .
+        #   git commit -m "Added navbar using insert_navbar.sh"
+        #   git push "https://${{ github.actor }}:${{ inputs.token }}@github.com/${{ github.repository }}.git" gh-pages
+        # else
+        #   echo "No changes to commit"
+        # fi
       shell: bash
