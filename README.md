@@ -8,9 +8,9 @@ This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl
 
 ```yaml
 - name: Add Navbar
-  uses: shravanngoswamii/DocsNav@v1
+  uses: TuringLang/DocsNav@v1
   with:
     doc-path: 'Path to the Documenter.jl output', default: 'docs/build'
-    navbar-url: 'URL of the navbar HTML to be inserted.', default: 'https://raw.githubusercontent.com/TuringLang/turinglang.github.io/main/assets/scripts/TuringNavbar.html'
+    navbar-url: 'URL of the navbar HTML to be inserted.', default: './scripts/TuringNavbar.html'
     exclude-paths: 'Comma-separated list of paths to exclude from navbar insertion.'
 ```

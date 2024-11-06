@@ -1,4 +1,5 @@
 name: 'Add Navbar Action'
+author: 'Shravan Goswami'
 description: 'Adds a top navigation bar to Documenter.jl-generated sites'
 inputs:
   doc-path:
