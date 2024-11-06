@@ -1,0 +1,79 @@
+name: 'Build Documenter.jl site'
+author: 'TuringLang'
+description: 'Build and deploy Documenter.jl site, with a TuringLang navbar'
+
+inputs:
+  julia-version:
+    description: 'Julia version to use'
+    required: false
+    default: '1'
+  doc-path:
+    description: 'Path to the Documenter.jl source folder'
+    required: false
+    default: 'docs'
+  doc-make-path:
+    description: 'Path to the Documenter.jl build script'
+    required: false
+    default: 'docs/make.jl'
+  exclude-paths:
+    description: 'Comma-separated list of paths to exclude from navbar insertion.'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v2
+      with:
+        version: ${{ inputs.julia-version }}
+
+    - name: Cache Julia packages
+      uses: julia-actions/cache@v2
+
+    - name: Install docs dependencies
+      shell: julia --color=yes --project=${{ inputs.doc-path }} {0}
+      run: |
+        using Pkg
+        Pkg.develop(PackageSpec(path=pwd()))
+        Pkg.instantiate()
+
+    - name: Build docs
+      shell: bash
+      run: julia --project=${{ inputs.doc-path }} ${{ inputs.doc-make-path }}
+
+      # We want to use the same version of DocsNav. In principle we would like
+      # to write `uses: TuringLang/actions/DocsNav@${{ github.action_ref }}`,
+      # but the `uses` block doesn't allow for expressions. As a workaround,
+      # this step symlinks the actions directory to a fixed path so that we can
+      # use it later.
+      # See https://github.com/orgs/community/discussions/41927
+    - name: Symlink actions folder to a fixed path
+      env:
+        GH_ACTION_REPO: ${{ github.action_repository }}
+        GH_ACTION_REF: ${{ github.action_ref }}
+      shell: bash
+      run: ln -s /home/runner/work/_actions/$GH_ACTION_REPO/$GH_ACTION_REF/  /home/runner/work/_actions/current
+
+    - name: Insert navbar
+      # Using the path symlinked in the previous step
+      uses: ./../../_actions/current/DocsNav
+      with:
+        doc-path: ${{ inputs.doc-path }}
+        navbar-url: ${{ github.action_path }}/../DocsNav/scripts/TuringNavbar.html
+        exclude-paths: ${{ inputs.exclude-paths }}
+
+    - name: Deploy docs to gh-pages branch
+      working-directory: ${{ inputs.doc-path }}
+      shell: julia --color=yes --project=. {0}
+      # Must pass `root` when `deploydocs()` is run from outside make.jl file
+      # Also, `root` must be an absolute path (hence the call to `pwd()`)
+      run: |
+        using Documenter
+        deploydocs(; root=pwd(), repo="github.com/${{ github.repository }}.git", push_preview=true)
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        JULIA_DEBUG: Documenter
