@@ -14,29 +14,13 @@ inputs:
     description: 'Comma-separated list of paths to exclude from navbar insertion.'
     required: false
     default: ''
-  token:
-    description: 'GitHub token for authentication'
-    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Configure Git
-      run: |
-        git config user.name github-actions[bot]
-        git config user.email github-actions[bot]@users.noreply.github.com
-      shell: bash
-
     - name: Update Navbar
       working-directory: ${{ inputs.doc-path }}
       run: |
         chmod +x ${{ github.action_path }}/scripts/insert_navbar.sh
         ${{ github.action_path }}/scripts/insert_navbar.sh . "${{ inputs.navbar-url }}" --exclude "${{ inputs.exclude-paths }}"
-        # if [[ -n $(git status -s) ]]; then
-        #   git add .
-        #   git commit -m "Added navbar using insert_navbar.sh"
-        #   git push "https://${{ github.actor }}:${{ inputs.token }}@github.com/${{ github.repository }}.git" gh-pages
-        # else
-        #   echo "No changes to commit"
-        # fi
       shell: bash
