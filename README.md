@@ -39,7 +39,7 @@ This does not affect local documentation building because `deploydocs()` doesn't
 ### Example usage
 
 ```yaml
-name: Build Documenter.jl docs
+name: Documentation
 
 on:
   push:
@@ -50,17 +50,23 @@ on:
     branches:
       - main
 
+concurrency:
+  # Skip intermediate builds: always.
+r # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 permissions:
   contents: write
   pull-requests: read
 
 jobs:
-  build-docs:
+  docs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Build Documenter.jl docs
-        uses: TuringLang/DocsNav/DocsDocumenter
+      - name: Build and deploy Documenter.jl docs
+        uses: TuringLang/DocsNav/DocsDocumenter@v2
 ```
 
 ### Parameters
