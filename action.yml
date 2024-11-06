@@ -7,9 +7,9 @@ inputs:
     # Most julia projects have it here
     default: 'docs/build'
   navbar-url:
-    description: 'URL of the navbar HTML to be inserted.'
+    description: 'URL or local path of the navbar HTML to be inserted.'
     required: false
-    default: 'https://raw.githubusercontent.com/TuringLang/turinglang.github.io/main/assets/scripts/TuringNavbar.html'
+    default: '${{ github.action_path }}/scripts/TuringNavbar.html'
   exclude-paths:
     description: 'Comma-separated list of paths to exclude from navbar insertion.'
     required: false

@@ -1,6 +1,5 @@
 #!/bin/bash
 # This script inserts a top navigation bar into Documenter.jl generated sites.
-# The resulting output is similar to MultiDocumenter's navigation menu.
 # It checks all HTML files in the specified directory and its subdirectories.
 
 # Function to print usage
@@ -17,8 +16,8 @@ fi
 
 # Directory containing HTML files (passed as the first argument to the script)
 HTML_DIR=$1
-# URL of the navigation bar HTML file (passed as the second argument to the script)
-NAVBAR_URL=$2
+# Path or URL of the navigation bar HTML file (passed as the second argument to the script)
+NAVBAR_SOURCE=$2
 # Initialize exclude list
 EXCLUDE_LIST=""
 
@@ -39,12 +38,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Download the navigation bar HTML content
-NAVBAR_HTML=$(curl -s $NAVBAR_URL)
+# Determine if NAVBAR_SOURCE is a URL (starts with http or https) or a file path
+if [[ $NAVBAR_SOURCE == http* ]]; then
+    NAVBAR_HTML=$(curl -s "$NAVBAR_SOURCE")
+else
+    NAVBAR_HTML=$(cat "$NAVBAR_SOURCE")
+fi
 
-# Check if the download was successful
+# Check if the download or read was successful
 if [ -z "$NAVBAR_HTML" ]; then
-    echo "Failed to download navbar HTML"
+    echo "Failed to retrieve navbar HTML from $NAVBAR_SOURCE"
     exit 1
 fi
 
