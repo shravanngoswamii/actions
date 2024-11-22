@@ -79,3 +79,42 @@ jobs:
 | `doc-make-path` | Path to the `make.jl` file | `docs/make.jl` (following Documenter.jl conventions) |
 | `julia-version` | Julia version to use | `'1'` |
 | `exclude-paths` | Comma-separated list of paths to exclude from navbar insertion | `""` |
+
+
+## Format
+
+Run JuliaFormatter on the content in the repository.
+
+### Example usage
+
+```yaml
+name: Format
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Format code
+        uses: TuringLang/actions/Format@v2
+```
+
+### Parameters
+
+| Parameter | Description | Default |
+| --- | --- | --- |
+| `suggest-changes` | Whether to comment on PRs with suggested changes | `"true"` |
