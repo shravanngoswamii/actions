@@ -35,7 +35,7 @@ Use this as one step in the build process for your documentation.
 
 This action performs a complete build and deploy of Documenter.jl documentation, inserting the above navbar in the process.
 
-**Note**: This action takes care of calling `deploydocs()`, so your `docs/make.jl` file does not need to contain a call to `deploydocs()`.
+**Note**: _Unless_ the `deploy` setting is explicitly set to `false`, this action takes care of calling `deploydocs()`, so your `docs/make.jl` file does not need to contain a call to `deploydocs()`.
 This does not affect local documentation building because `deploydocs()` doesn't do anything locally.However, on CI, it will cause the documentation to be deployed twice: once without the navbar and once with.
 
 ### Example usage
@@ -79,6 +79,7 @@ jobs:
 | `doc-make-path` | Path to the `make.jl` file | `docs/make.jl` (following Documenter.jl conventions) |
 | `julia-version` | Julia version to use | `'1'` |
 | `exclude-paths` | Comma-separated list of paths to exclude from navbar insertion | `""` |
+| `deploy` | Whether to deploy to the `gh-pages` branch or not | `true` |
 
 
 ## Format

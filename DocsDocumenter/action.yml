@@ -19,6 +19,10 @@ inputs:
     description: 'Comma-separated list of paths to exclude from navbar insertion.'
     required: false
     default: ''
+  deploy:
+    description: 'Whether to deploy the docs to the gh-pages branch'
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -67,6 +71,7 @@ runs:
         exclude-paths: ${{ inputs.exclude-paths }}
 
     - name: Deploy docs to gh-pages branch
+      if: ${{ inputs.deploy == 'true' }}
       working-directory: ${{ inputs.doc-path }}
       shell: julia --color=yes --project=. {0}
       # Must pass `root` when `deploydocs()` is run from outside make.jl file
