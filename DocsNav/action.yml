@@ -34,9 +34,9 @@ runs:
       run: |
         # Check if navbar-url is empty and set accordingly
         if [[ -z "${{ inputs.navbar-url }}" ]]; then
-          NAVBAR_URL=${{ github.action_path }}/scripts/TuringNavbar.html'
+          NAVBAR_URL="${{ github.action_path }}/scripts/TuringNavbar.html"
         else
-          NAVBAR_URL=${{ inputs.navbar-url }}
+          NAVBAR_URL="${{ inputs.navbar-url }}"
         fi
 
         readarray -t EXCLUDE_PATHS < <(echo '${{ inputs.exclude-paths }}' | jq -r '.[]')
