@@ -12,7 +12,7 @@ inputs:
   navbar-url:
     description: 'URL or local path of the navbar HTML to be inserted.'
     required: false
-    default: '${{ github.action_path }}/scripts/TuringNavbar.html'
+    default: ''
   exclude-paths:
     # GitHub Actions doesn't allow array inputs, so the most robust way to
     # handle this (i.e. avoiding weird delimiter / quotation issues) is to use
@@ -32,12 +32,19 @@ runs:
     - name: Update Navbar
       working-directory: ${{ inputs.doc-path }}
       run: |
+        # Check if navbar-url is empty and set accordingly
+        if [[ -z "${{ inputs.navbar-url }}" ]]; then
+          NAVBAR_URL=${{ github.action_path }}/scripts/TuringNavbar.html'
+        else
+          NAVBAR_URL=${{ inputs.navbar-url }}
+        fi
+
         readarray -t EXCLUDE_PATHS < <(echo '${{ inputs.exclude-paths }}' | jq -r '.[]')
         # Check if array is empty
         if (( ${#EXCLUDE_PATHS[@]} )); then
-          julia ${{ github.action_path }}/scripts/insert_navbar.jl . "${{ inputs.navbar-url }}" --exclude $EXCLUDE_PATHS
+          julia ${{ github.action_path }}/scripts/insert_navbar.jl . "${NAVBAR_URL}" --exclude "$EXCLUDE_PATHS[@]"
         else
-          julia ${{ github.action_path }}/scripts/insert_navbar.jl . "${{ inputs.navbar-url }}"
+          julia ${{ github.action_path }}/scripts/insert_navbar.jl . "${NAVBAR_URL}"
         fi
 
       shell: bash
