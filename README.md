@@ -33,9 +33,6 @@ See `example_workflows/Docs.yml` for an example workflow.
 
 This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl` generated sites.
 
-**Note:** This action requires Julia to be installed.
-You have to take care of installing Julia (e.g. using `julia-actions/setup-julia` if it is not already installed.
-
 `TuringNavbar.html` in `DocsNav/scripts` directory contains code for building navigation bar for Turing language satellite packages' documentation but you can use your own navigation bar for your project!
 
 ### Parameters
@@ -45,6 +42,7 @@ You have to take care of installing Julia (e.g. using `julia-actions/setup-julia
 | `doc-path` | Path to the built HTML documentation | None, **must be provided** |
 | `navbar-url` | Path to, or URL of, the navbar HTML to be inserted | `DocsNav/scripts/TuringNavbar.html` in this repository |
 | `exclude-paths` | JSON array of filepath patterns to exclude from navbar insertion | `"[]"` |
+| `julia-version` | Julia version to use | `'1'` |
 
 ### Example usage
 
