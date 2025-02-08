@@ -28,7 +28,6 @@ jobs:
         uses: TuringLang/actions/DocsNav@main
         with:
           doc-path: '.'
-          navbar-url: ${{ github.action_path }}/scripts/TuringNavbar.html
 
       - name: Commit and push changes
         run: |
