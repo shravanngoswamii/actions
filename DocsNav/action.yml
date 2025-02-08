@@ -32,7 +32,7 @@ runs:
     - name: Update Navbar
       working-directory: ${{ inputs.doc-path }}
       run: |
-        EXCLUDE_PATHS=$(echo '${{ inputs.exclude-paths }}' | jq -r '.[]')
+        readarray -t EXCLUDE_PATHS < <(echo '${{ inputs.exclude-paths }}' | jq -r '.[]')
         # Check if array is empty
         if (( ${#EXCLUDE_PATHS[@]} )); then
           julia ${{ github.action_path }}/scripts/insert_navbar.jl . "${{ inputs.navbar-url }}" --exclude $EXCLUDE_PATHS
