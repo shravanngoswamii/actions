@@ -3,9 +3,8 @@ author: 'TuringLang'
 description: >
   Build and deploy Documenter.jl site with a TuringLang navbar.
   This composite action supports posting a pull-request preview URL.
-  New input fields let you specify whether your GitHub Pages site is hosted
-  as a user site (username.github.io) or as a project site (username.github.io/reponame)
-  or to provide a custom base URL.
+  New inputs let you specify if your GitHub Pages site is hosted as a user site
+  (username.github.io), a project site (username.github.io/reponame), or via a custom URL.
 
 inputs:
   julia-version:
@@ -95,20 +94,27 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
         JULIA_DEBUG: Documenter
 
+    - name: Compute preview URL
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      id: compute_preview
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.custom_base_url }}" ]; then
+          preview_url="https://${{ inputs.custom_base_url }}/previews/PR${{ github.event.pull_request.number }}"
+        elif [ "${{ inputs.user_site }}" = "true" ]; then
+          preview_url="https://${{ github.repository_owner }}.github.io/previews/PR${{ github.event.pull_request.number }}"
+        else
+          preview_url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/PR${{ github.event.pull_request.number }}"
+        fi
+        echo "PREVIEW_URL=${preview_url}" >> "$GITHUB_OUTPUT"
+
     - name: Comment preview URL
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
       uses: thollander/actions-comment-pull-request@v2
       with:
         message: |
           <!-- preview-url-comment -->
-          Preview the changes:
-          ${{ inputs.custom_base_url != '' 
-              ? ('https://' + inputs.custom_base_url + '/previews/PR' + github.event.pull_request.number)
-              : (inputs.user_site == 'true'
-                  ? ('https://' + github.repository_owner + '.github.io/previews/PR' + github.event.pull_request.number)
-                  : ('https://' + github.repository_owner + '.github.io/' + github.event.repository.name + '/previews/PR' + github.event.pull_request.number)
-                )
-            }}
+          Preview the changes: ${{ steps.compute_preview.outputs.PREVIEW_URL }}
           Please avoid using the search feature and navigation bar in PR previews!
         comment_tag: preview-url-comment
       env:
