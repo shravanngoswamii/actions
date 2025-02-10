@@ -1,6 +1,11 @@
 name: 'Build Documenter.jl site'
 author: 'TuringLang'
-description: 'Build and deploy Documenter.jl site, with a TuringLang navbar'
+description: >
+  Build and deploy Documenter.jl site with a TuringLang navbar.
+  This composite action supports posting a pull-request preview URL.
+  New input fields let you specify whether your GitHub Pages site is hosted
+  as a user site (username.github.io) or as a project site (username.github.io/reponame)
+  or to provide a custom base URL.
 
 inputs:
   julia-version:
@@ -20,8 +25,6 @@ inputs:
     required: false
     default: 'docs/build'
   exclude-paths:
-    # GitHub Actions doesn't allow array inputs, so the most robust way to
-    # handle this is to use a JSON string. DocsNav then parses this using jq.
     description: 'JSON array of filepath patterns to exclude from navbar insertion.'
     required: false
     default: '[]'
@@ -29,6 +32,18 @@ inputs:
     description: 'Whether to deploy the docs to the gh-pages branch'
     required: false
     default: 'true'
+  user_site:
+    description: >
+      Set to 'true' if your GitHub Pages site is hosted at username.github.io
+      (i.e. a user site) rather than at username.github.io/reponame.
+    required: false
+    default: 'false'
+  custom_base_url:
+    description: >
+      Optional custom base URL (without protocol) for your GitHub Pages site.
+      If provided, this value overrides the auto-generated URL.
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -55,21 +70,14 @@ runs:
       shell: bash
       run: julia --project=${{ inputs.doc-path }} ${{ inputs.doc-make-path }}
 
-      # We want to use the same version of DocsNav. In principle we would like
-      # to write `uses: TuringLang/actions/DocsNav@${{ github.action_ref }}`,
-      # but the `uses` block doesn't allow for expressions. As a workaround,
-      # this step symlinks the actions directory to a fixed path so that we can
-      # use it later.
-      # See https://github.com/orgs/community/discussions/41927
     - name: Symlink actions folder to a fixed path
       env:
         GH_ACTION_REPO: ${{ github.action_repository }}
         GH_ACTION_REF: ${{ github.action_ref }}
       shell: bash
-      run: ln -s /home/runner/work/_actions/$GH_ACTION_REPO/$GH_ACTION_REF/  /home/runner/work/_actions/current
+      run: ln -s /home/runner/work/_actions/$GH_ACTION_REPO/$GH_ACTION_REF/ /home/runner/work/_actions/current
 
     - name: Insert navbar
-      # Using the path symlinked in the previous step
       uses: ./../../_actions/current/DocsNav
       with:
         doc-path: ${{ inputs.doc-build-path }}
@@ -80,11 +88,28 @@ runs:
       if: ${{ inputs.deploy == 'true' }}
       working-directory: ${{ inputs.doc-path }}
       shell: julia --color=yes --project=. {0}
-      # Must pass `root` when `deploydocs()` is run from outside make.jl file
-      # Also, `root` must be an absolute path (hence the call to `pwd()`)
       run: |
         using Documenter
         deploydocs(; root=pwd(), repo="github.com/${{ github.repository }}.git", push_preview=true)
       env:
         GITHUB_TOKEN: ${{ github.token }}
         JULIA_DEBUG: Documenter
+
+    - name: Comment preview URL
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      uses: thollander/actions-comment-pull-request@v2
+      with:
+        message: |
+          <!-- preview-url-comment -->
+          Preview the changes:
+          ${{ inputs.custom_base_url != '' 
+              ? ('https://' + inputs.custom_base_url + '/previews/PR' + github.event.pull_request.number)
+              : (inputs.user_site == 'true'
+                  ? ('https://' + github.repository_owner + '.github.io/previews/PR' + github.event.pull_request.number)
+                  : ('https://' + github.repository_owner + '.github.io/' + github.event.repository.name + '/previews/PR' + github.event.pull_request.number)
+                )
+            }}
+          Please avoid using the search feature and navigation bar in PR previews!
+        comment_tag: preview-url-comment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
