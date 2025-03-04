@@ -7,6 +7,11 @@ inputs:
     description: 'Julia version to use'
     required: false
     default: '1'
+  # Keep this input with underscore to avoid potential issues
+  pkg_path:
+    description: 'Path to the package root. If empty, defaults to the current working directory.'
+    required: false
+    default: ''
   doc-path:
     description: 'Path to the Documenter.jl source folder'
     required: false
@@ -50,9 +55,16 @@ runs:
 
     - name: Install docs dependencies
       shell: julia --color=yes --project=${{ inputs.doc-path }} {0}
+      env:
+        INPUT_PKG_PATH: ${{ inputs.pkg_path }}
       run: |
         using Pkg
-        Pkg.develop(PackageSpec(path=pwd()))
+        pkg_path = ENV["INPUT_PKG_PATH"]
+        if pkg_path == ""
+          Pkg.develop(PackageSpec(path=pwd()))
+        else
+          Pkg.develop(PackageSpec(path=pkg_path))
+        end
         Pkg.instantiate()
 
     - name: Build docs
