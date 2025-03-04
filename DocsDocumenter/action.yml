@@ -7,8 +7,7 @@ inputs:
     description: 'Julia version to use'
     required: false
     default: '1'
-  # Specify the package root for Pkg.develop
-  pkg-path:
+  pkgpath:
     description: 'Path to the package root. If empty, defaults to the current working directory.'
     required: false
     default: ''
@@ -57,13 +56,13 @@ runs:
       shell: julia --color=yes --project=${{ inputs.doc-path }} {0}
       run: |
         using Pkg
-        pkg_path = get(ENV, "INPUT_PKG_PATH", "")
-        if pkg_path == ""
+        pkgpath = get(ENV, "INPUT_PKG_PATH", "")
+        if pkgpath == ""
           # Fallback: assume the package is in the current working directory
           Pkg.develop(PackageSpec(path=pwd()))
         else
           # Use the provided package root
-          Pkg.develop(PackageSpec(path=pkg_path))
+          Pkg.develop(PackageSpec(path=pkgpath))
         end
         Pkg.instantiate()
 
