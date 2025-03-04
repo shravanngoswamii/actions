@@ -7,7 +7,8 @@ inputs:
     description: 'Julia version to use'
     required: false
     default: '1'
-  pkgpath:
+  # Renamed input with underscore to avoid potential issues
+  pkg_path:
     description: 'Path to the package root. If empty, defaults to the current working directory.'
     required: false
     default: ''
@@ -52,17 +53,20 @@ runs:
     - name: Cache Julia packages
       uses: julia-actions/cache@v2
 
-    - name: Install docs dependencies
+    - name: Install docs dependencies (with debugging)
       shell: julia --color=yes --project=${{ inputs.doc-path }} {0}
+      env:
+        INPUT_PKG_PATH: ${{ inputs.pkg_path }}
       run: |
         using Pkg
-        pkgpath = get(ENV, "INPUT_PKG_PATH", "")
-        if pkgpath == ""
-          # Fallback: assume the package is in the current working directory
+        println("DEBUG: INPUT_PKG_PATH = ", ENV["INPUT_PKG_PATH"])
+        pkg_path = ENV["INPUT_PKG_PATH"]
+        if pkg_path == ""
+          println("DEBUG: Falling back to pwd(): ", pwd())
           Pkg.develop(PackageSpec(path=pwd()))
         else
-          # Use the provided package root
-          Pkg.develop(PackageSpec(path=pkgpath))
+          println("DEBUG: Using pkg path: ", pkg_path)
+          Pkg.develop(PackageSpec(path=pkg_path))
         end
         Pkg.instantiate()
 
@@ -70,21 +74,14 @@ runs:
       shell: bash
       run: julia --project=${{ inputs.doc-path }} ${{ inputs.doc-make-path }}
 
-      # We want to use the same version of DocsNav. In principle we would like
-      # to write `uses: TuringLang/actions/DocsNav@${{ github.action_ref }}`,
-      # but the `uses` block doesn't allow for expressions. As a workaround,
-      # this step symlinks the actions directory to a fixed path so that we can
-      # use it later.
-      # See https://github.com/orgs/community/discussions/41927
     - name: Symlink actions folder to a fixed path
       env:
         GH_ACTION_REPO: ${{ github.action_repository }}
         GH_ACTION_REF: ${{ github.action_ref }}
       shell: bash
-      run: ln -s /home/runner/work/_actions/$GH_ACTION_REPO/$GH_ACTION_REF/  /home/runner/work/_actions/current
+      run: ln -s /home/runner/work/_actions/$GH_ACTION_REPO/$GH_ACTION_REF/ /home/runner/work/_actions/current
 
     - name: Insert navbar
-      # Using the path symlinked in the previous step
       uses: ./../../_actions/current/DocsNav
       with:
         doc-path: ${{ inputs.doc-build-path }}
@@ -95,8 +92,6 @@ runs:
       if: ${{ inputs.deploy == 'true' }}
       working-directory: ${{ inputs.doc-path }}
       shell: julia --color=yes --project=. {0}
-      # Must pass `root` when `deploydocs()` is run from outside make.jl file
-      # Also, `root` must be an absolute path (hence the call to `pwd()`)
       run: |
         using Documenter
         deploydocs(; root=pwd(), repo="github.com/${{ github.repository }}.git", dirname="${{ inputs.dirname }}", push_preview=true)
