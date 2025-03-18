@@ -27,7 +27,7 @@ If your `docs/make.jl` file contains a call to `deploydocs()`, it is not a big d
 
 ### Example usage
 
-See `example_workflows/Docs.yml` for an example workflow.
+See [`example_workflows/Docs.yml`](https://github.com/TuringLang/actions/blob/main/example_workflows/Docs.yml) for an example workflow.
 
 ----------------
 
@@ -51,7 +51,7 @@ This action inserts a MultiDocumenter-style top navigation bar to `Documenter.jl
 In TuringLang, we make this action run once every week so that if the navbar HTML file is updated, all our documentation will use it.
 We also have a `workflow_dispatch` trigger so that we can manually run this action whenever we want.
 
-See `example_workflows/DocsNav.yml` for an example workflow.
+See [`example_workflows/DocsNav.yml`](https://github.com/TuringLang/actions/blob/main/example_workflows/DocsNav.yml) for an example workflow.
 
 ----------------
 
@@ -59,36 +59,12 @@ See `example_workflows/DocsNav.yml` for an example workflow.
 
 Run JuliaFormatter on the content in the repository.
 
-### Example usage
-
-```yaml
-name: Format
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  # Skip intermediate builds: always.
-  # Cancel intermediate builds: only if it is a pull request build.
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
-
-jobs:
-  format:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Format code
-        uses: TuringLang/actions/Format@v2
-```
-
 ### Parameters
 
 | Parameter | Description | Default |
 | --- | --- | --- |
 | `suggest-changes` | Whether to comment on PRs with suggested changes | `"true"` |
+
+### Example usage
+
+See [`example_workflows/Format.yml`](https://github.com/TuringLang/actions/blob/main/example_workflows/Format.yml) for an example workflow.
