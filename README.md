@@ -2,11 +2,17 @@
 
 This repository contains a collection of GitHub actions to be used across different TuringLang repositories.
 
+Namely, these are:
+
+- [DocsDocumenter](#docsdocumenter)
+- [DocsNav](#docsnav)
+- [Format](#format)
+
 ----------
 
 ## DocsDocumenter
 
-This action performs a complete build and deploy of Documenter.jl documentation, inserting the above navbar in the process.
+This action performs a complete build and deploy of Documenter.jl documentation, inserting a navbar in the process.
 
 **Note**: _Unless_ the `deploy` setting is explicitly set to `false`, this action takes care of calling `deploydocs()`, so your `docs/make.jl` file does not need to contain a call to `deploydocs()`.
 
