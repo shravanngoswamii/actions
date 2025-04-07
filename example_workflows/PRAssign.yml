@@ -12,4 +12,4 @@ jobs:
   assign-author:
     runs-on: ubuntu-latest
     steps:
-      - uses: TuringLang/PRAssign@main
+      - uses: TuringLang/actions/PRAssign@main

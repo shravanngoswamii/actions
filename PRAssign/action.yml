@@ -9,10 +9,12 @@ runs:
 
       - name: Get PR number
         id: number
+        shell: bash
         run: echo "number=${{ github.event.pull_request.number }} " >> $GITHUB_OUTPUT
 
       - name: Get PR author
         id: author
+        shell: bash
         run: |
           AUTHOR=$(gh pr view ${PR_NUMBER} --json author -q .author.login)
           echo "author=${AUTHOR}" >> $GITHUB_OUTPUT
@@ -21,6 +23,7 @@ runs:
           PR_NUMBER: ${{ steps.number.outputs.number }}
 
       - name: Assign PR author
+        shell: bash
         run: |
           gh pr edit ${PR_NUMBER} --add-assignee ${PR_AUTHOR}
         env:
