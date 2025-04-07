@@ -7,6 +7,7 @@ Namely, these are:
 - [DocsDocumenter](#docsdocumenter)
 - [DocsNav](#docsnav)
 - [Format](#format)
+- [PRAssign](#prassign)
 
 ----------
 
