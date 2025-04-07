@@ -1,0 +1,29 @@
+name: 'Automatically assign PR author'
+author: 'TuringLang'
+description: 'Add PR author as an assignee'
+
+runs:
+  using: "composite"
+  steps:
+      - uses: actions/checkout@v4
+
+      - name: Get PR number
+        id: number
+        run: echo "number=${{ github.event.pull_request.number }} " >> $GITHUB_OUTPUT
+
+      - name: Get PR author
+        id: author
+        run: |
+          AUTHOR=$(gh pr view ${PR_NUMBER} --json author -q .author.login)
+          echo "author=${AUTHOR}" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.number.outputs.number }}
+
+      - name: Assign PR author
+        run: |
+          gh pr edit ${PR_NUMBER} --add-assignee ${PR_AUTHOR}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.number.outputs.number }}
+          PR_AUTHOR: ${{ steps.author.outputs.author }}

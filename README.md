@@ -74,3 +74,15 @@ Run JuliaFormatter on the content in the repository.
 ### Example usage
 
 See [`example_workflows/Format.yml`](https://github.com/TuringLang/actions/blob/main/example_workflows/Format.yml) for an example workflow.
+
+## PRAssign
+
+Automatically add PR authors as an assignee.
+
+### Parameters
+
+None.
+
+### Example usage
+
+See [`example_workflows/PRAssign.yml`](https://github.com/TuringLang/actions/blob/main/example_workflows/PRAssign.yml) for an example workflow.
