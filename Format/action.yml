@@ -19,13 +19,21 @@ runs:
     - name: Format code
       run: |
         using Pkg
-        Pkg.add(; name="JuliaFormatter", uuid="98e50ef6-434e-11e9-1051-2b60c6c9e899")
+        Pkg.add(; name="JuliaFormatter", version="1")
         using JuliaFormatter
         format("."; verbose=true)
       shell: julia --color=yes {0}
 
+    - name: Get JuliaFormatter version
+      id: get-version
+      run: |
+        VERSION=$(julia -e 'using Pkg; Pkg.status("JuliaFormatter")' | grep JuliaFormatter | sed 's/.* JuliaFormatter v//')
+        echo "JuliaFormatter version: $VERSION"
+        echo "version=$VERSION" >> $GITHUB_ENV
+      shell: bash
+
     - uses: reviewdog/action-suggester@v1
       if: ${{ inputs.suggest-changes && github.event_name == 'pull_request' }}
       with:
-        tool_name: JuliaFormatter
+        tool_name: JuliaFormatter ${{ steps.get-version.outputs.version }}
         fail_level: any
