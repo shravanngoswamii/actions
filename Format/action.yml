@@ -35,5 +35,5 @@ runs:
     - uses: reviewdog/action-suggester@v1
       if: ${{ inputs.suggest-changes && github.event_name == 'pull_request' }}
       with:
-        tool_name: JuliaFormatter ${{ steps.get-version.outputs.version }}
+        tool_name: JuliaFormatter v${{ steps.get-version.outputs.version }}
         fail_level: any
