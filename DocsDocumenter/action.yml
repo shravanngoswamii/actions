@@ -38,6 +38,14 @@ inputs:
     description: 'Whether to deploy the docs to the gh-pages branch'
     required: false
     default: 'true'
+  pre_build:
+    description: 'Shell command or script path to run before building the documentation.'
+    required: false
+    default: ''
+  pre_build_continue_on_error:
+    description: 'Whether to continue building the documentation if the pre-build command fails.'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -66,6 +74,19 @@ runs:
           Pkg.develop(PackageSpec(path=pkg_path))
         end
         Pkg.instantiate()
+
+    - name: Run pre-build command
+      if: ${{ inputs.pre_build != '' }}
+      shell: bash
+      continue-on-error: ${{ inputs.pre_build_continue_on_error == 'true' }}
+      working-directory: ${{ inputs.doc-path }}
+      run: |
+        if [ -f "${{ inputs.pre_build }}" ]; then
+          chmod +x "${{ inputs.pre_build }}"
+          ./"${{ inputs.pre_build }}"
+        else
+          bash -c "${{ inputs.pre_build }}"
+        fi
 
     - name: Build docs
       shell: bash
