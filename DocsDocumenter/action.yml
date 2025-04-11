@@ -75,10 +75,12 @@ runs:
 
         # Additional packages development (for multi-package repos)
         additional_pkg_paths = ENV["INPUT_ADDITIONAL_PKG_PATHS"]
-        for path in split(additional_pkg_paths, "\n")
-          path = strip(path)
-          println("Developing additional package from: ", path)
-          Pkg.develop(PackageSpec(path=path))
+        if additional_pkg_paths != ""
+          for path in split(additional_pkg_paths, "\n")
+            path = strip(path)
+            println("Developing additional package from: ", path)
+            Pkg.develop(PackageSpec(path=path))
+          end
         end
 
         Pkg.instantiate()
