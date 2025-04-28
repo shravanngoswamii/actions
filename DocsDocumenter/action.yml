@@ -135,9 +135,6 @@ runs:
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
       shell: bash
       run: |
-        # (1) Authenticate gh CLI with the injected token
-        echo "$GITHUB_TOKEN" | gh auth login --with-token
-
         # (2) Add or update the comment
         gh pr comment "${{ github.event.pull_request.number }}" \
           --body "PR Docs Preview: ${{ steps.preview.outputs.preview_url }}" \
