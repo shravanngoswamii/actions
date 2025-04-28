@@ -123,21 +123,29 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
         JULIA_DEBUG: Documenter
         
-    - name: Compute preview URL
+    - name: Compute Docs Preview URL
       id: preview
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
       shell: bash
       run: |
-        preview_url="https://${{ github.repository_owner }}.github.io/${{ github.repository }}${{ inputs.dirname != '' && format('/{0}', inputs.dirname) || '' }}/previews/PR${{ github.event.pull_request.number }}"
-        echo "preview_url=$preview_url" >> $GITHUB_OUTPUT
+        echo "preview_url=https://${{ github.repository_owner }}.github.io/${{ github.repository }}${{ inputs.dirname != '' && format('/{0}', inputs.dirname) || '' }}/previews/PR${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
 
-    - name: Upsert PR preview comment via gh
+    - name: Find Existing Docs Preview URL Comment
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
-      shell: bash
-      run: |
-        # (2) Add or update the comment
-        gh pr comment "${{ github.event.pull_request.number }}" \
-          --body "PR Docs Preview: ${{ steps.preview.outputs.preview_url }}" \
-          --edit-last \
-          --create-if-none
-
+      uses: peter-evans/find-comment@v3
+      id: pr_docs_preview_url
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: github-actions[bot]
+          
+    - name: Comment Docs Preview URL
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          PR Docs Preview: ${{ steps.preview.outputs.preview_url }}
+        comment-id: ${{ steps.pr_docs_preview_url.outputs.comment-id }}
+        edit-mode: replace
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
