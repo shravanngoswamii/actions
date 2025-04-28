@@ -122,3 +122,20 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
         JULIA_DEBUG: Documenter
+        
+    - name: Compute preview URL
+      id: preview
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      shell: bash
+      run: |
+        echo "preview_url=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}${{ inputs.dirname && '/'+inputs.dirname || '' }}/previews/PR${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+
+    - name: Comment preview URL
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      uses: peter-evans/create-or-update-comment@v4
+      with:
+        token:        ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          <!-- preview-url-comment -->
+          Preview the changes: ${{ steps.preview.outputs.preview_url }}
