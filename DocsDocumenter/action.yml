@@ -131,6 +131,7 @@ runs:
         echo "preview_url=https://${{ github.repository_owner }}.github.io/${{ github.repository }}${{ inputs.dirname != '' && format('/{0}', inputs.dirname) || '' }}/previews/PR${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
 
     - name: Find Existing Docs Preview URL Comment
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
       uses: peter-evans/find-comment@v3
       id: pr_docs_preview_url
       with:
