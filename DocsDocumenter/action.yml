@@ -137,13 +137,17 @@ runs:
       with:
         issue-number: ${{ github.event.pull_request.number }}
         comment-author: github-actions[bot]
+        body-includes: "preview-url-${{ inputs.dirname }}"
           
     - name: Comment Docs Preview URL
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
       uses: peter-evans/create-or-update-comment@v4
       with:
+        token: ${{ github.token }}                                  # use the injected installation token
         issue-number: ${{ github.event.pull_request.number }}
-        body: |
-          PR Docs Preview: ${{ steps.preview.outputs.preview_url }}
         comment-id: ${{ steps.pr_docs_preview_url.outputs.comment-id }}
         edit-mode: replace
+        body: |
+          <!-- preview-url-${{ inputs.dirname }} -->
+          PR Docs Preview for **${{ inputs.dirname }}**:
+          ${{ steps.preview.outputs.preview_url }}
