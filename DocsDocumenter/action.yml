@@ -125,6 +125,7 @@ runs:
         
     - name: Set docs subdirectory path
       if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      shell: bash
       run: echo "DOCS_SUBDIR=${{ inputs.dirname != '' && format('/{0}', inputs.dirname) || '' }}" >> $GITHUB_ENV
 
     - name: Check for Existing Docs Preview Comment
