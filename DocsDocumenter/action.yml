@@ -124,12 +124,12 @@ runs:
         JULIA_DEBUG: Documenter
         
     - name: Set docs subdirectory path
-      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
       shell: bash
       run: echo "DOCS_SUBDIR=${{ inputs.dirname != '' && format('/{0}', inputs.dirname) || '' }}" >> $GITHUB_ENV
 
     - name: Check for Existing Docs Preview Comment
-      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' }}
+      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
       uses: peter-evans/find-comment@v3
       id: existing_docs_preview_comment
       with:
