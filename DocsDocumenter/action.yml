@@ -137,13 +137,11 @@ runs:
         comment-author: github-actions[bot]
         body-includes: "docs-preview-url-${{ github.event.repository.name }}${{ env.DOCS_SUBDIR }}"
 
-    - name: Create or Update Documentation Preview Comment
-      if: ${{ github.event_name == 'pull_request' && inputs.deploy == 'true' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
+    - name: Create Documentation Preview Comment (if needed)
+      if: ${{ steps.existing_docs_preview_comment.outputs.comment-id == '' && github.event_name == 'pull_request' && inputs.deploy == 'true' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
       uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.pull_request.number }}
-        comment-id: ${{ steps.existing_docs_preview_comment.outputs.comment-id }}
-        edit-mode: replace
         body: |
           <!-- docs-preview-url-${{ github.event.repository.name }}${{ env.DOCS_SUBDIR }} -->
           ${{ github.event.repository.name }}${{ env.DOCS_SUBDIR }} documentation for PR #${{ github.event.pull_request.number }} is available at:
